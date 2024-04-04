@@ -1,12 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 import { useRef, useEffect, useState } from "react";
+import type { ImgHTMLAttributes } from "react";
 
-type Props = {
-  image: string;
+type LazyImageProps = {
+  src: string;
 };
 
-export function RandomFox({ image }: Props): JSX.Element {
+type Props = ImgHTMLAttributes<HTMLImageElement> & LazyImageProps;
+
+export function LazyImage({ src, ...imgProps }: Props): JSX.Element {
   const node = useRef<HTMLImageElement>(null);
-  const [src, setSrc] = useState(
+  const [currentSrc, setCurrentSrc] = useState(
     "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiLz4="
   );
 
@@ -17,7 +21,7 @@ export function RandomFox({ image }: Props): JSX.Element {
           return;
         }
 
-        setSrc(image);
+        setCurrentSrc(src);
       });
     });
 
@@ -28,16 +32,7 @@ export function RandomFox({ image }: Props): JSX.Element {
     return () => {
       observer.disconnect();
     };
-  }, [image]);
+  }, [src]);
 
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      ref={node}
-      width="320"
-      height="auto"
-      src={src}
-      className="mx-auto rounded-md bg-gray-300"
-    />
-  );
+  return <img ref={node} src={currentSrc} {...imgProps} />;
 }
